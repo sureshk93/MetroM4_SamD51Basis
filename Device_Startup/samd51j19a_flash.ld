@@ -82,12 +82,14 @@ SECTIONS
     KEEP(*(.vectors .vectors.*))
 
     /*Program Code*/
-    . = ALIGN(16); /*New Subsection*/
+    /*. = ALIGN(16); New Subsection*/
     *(.text .text.* .gnu.linkonce.t.*)
 
     /*Thumb <==> ARM Code Translation Glue*/
-    . = ALIGN(16); /*New Subsection*/
+    /*. = ALIGN(16); New Subsection*/
     *(.glue_7t) *(.glue_7)
+
+    *(.ARM.extab* .gnu.linkonce.armextab.*)
 
     /*C & C++ Special Generated Code, part of main program code*/
 
@@ -168,6 +170,7 @@ SECTIONS
   */
   .lnl (NOLOAD):
   {
+    . = ALIGN(4); /*New piece*/
     _slnl = .;
     *(.lnl*)
     _elnl = .;
@@ -184,7 +187,7 @@ SECTIONS
   */
   .rom1 (NOLOAD):
   {
-    . += 512; /*Start at 2nd page*/
+    . = 512; /*2nd page from start*/
     _srom1 = .;
     *(.rom1*)
     _erom1 = .;
