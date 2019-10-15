@@ -73,7 +73,7 @@ SECTIONS
   .text :
   {
     /*Start at top*/
-    . = 0x00000000;
+    . = ALIGN(4); /*New piece*/
     _stext = .;
     _sfixed = .;
     
@@ -82,8 +82,12 @@ SECTIONS
     KEEP(*(.vectors .vectors.*))
     
     /*Program Code*/
-    . = ALIGN(16); /*New Subsection*/
+    /*. = ALIGN(16); /*New Subsection*/
     *(.text .text.* .gnu.linkonce.t.*)
+    
+    /*Thumb <==> ARM Code Translation Glue*/
+    /*. = ALIGN(16); /*New Subsection*/
+    *(.glue_7t) *(.glue_7)
     
     /*C & C++ Special Generated Code, part of main program code*/
     
@@ -126,10 +130,6 @@ SECTIONS
     KEEP (*(SORT(.dtors.*)))
     KEEP (*crtend.o(.dtors))
     
-    /*Thumb <==> ARM Code Translation Glue*/
-    . = ALIGN(16); /*New Subsection*/
-    *(.glue_7t) *(.glue_7)
-    
     /*Read-Only/Constant Data, placing in a new page*/
     . = ALIGN(512); /*New Page*/
     *(.rodata .rodata* .gnu.linkonce.r.*)
@@ -168,7 +168,6 @@ SECTIONS
   */
   .lnl (NOLOAD):
   {
-    . = ALIGN(4); /*New piece*/
     _slnl = .;
     *(.lnl*)
     _elnl = .;
@@ -185,7 +184,7 @@ SECTIONS
   */
   .rom1 (NOLOAD):
   {
-    . = 512; /*2nd page from start*/
+    . += 512; /*Start at 2nd page*/
     _srom1 = .;
     *(.rom1*)
     _erom1 = .;
