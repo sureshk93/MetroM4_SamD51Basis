@@ -13,10 +13,11 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 */
+
 /**
  * \file
  *
- * \brief Linker script for running in internal FLASH on the SAMD51J19A
+ * \brief Linker script for running in internal SRAM on the SAMD51J19A
  *
  * Copyright (c) 2019 Microchip Technology Inc.
  *
@@ -25,6 +26,7 @@
  * \page License
  */
 
+
 OUTPUT_FORMAT("elf32-littlearm", "elf32-littlearm", "elf32-littlearm")
 OUTPUT_ARCH(arm)
 SEARCH_DIR(.)
@@ -32,13 +34,9 @@ SEARCH_DIR(.)
 /* Memory Spaces Definitions */
 MEMORY
 {
-  rom0     (rx)  : ORIGIN = 0x00000000, LENGTH = 0x0003F800
-  lnl      (rx)  : ORIGIN = 0x0003F800, LENGTH = 0x00000800 /*Load-N-Lock 0-Wait State Caching: 2KB*/
-  rom1     (rx)  : ORIGIN = 0x00040000, LENGTH = 0x00018000
-  qspi     (rx)  : ORIGIN = 0x04000000, LENGTH = 0x01000000
   ram      (rwx) : ORIGIN = 0x20000000, LENGTH = 0x00030000
-  seeprom  (rx)  : ORIGIN = 0x44000000, LENGTH = 0x00010000
   bkupram  (rwx) : ORIGIN = 0x47000000, LENGTH = 0x00002000
+  qspi     (rwx) : ORIGIN = 0x04000000, LENGTH = 0x01000000
 }
 
 /* The stack size used by the application. NOTE: you need to adjust according to your application. */
@@ -94,44 +92,18 @@ SECTIONS
 
         . = ALIGN(4);
         _efixed = .;            /* End of text section */
-    } > rom0
+    } > ram
 
     /* .ARM.exidx is sorted, so has to go in its own output section.  */
     PROVIDE_HIDDEN (__exidx_start = .);
     .ARM.exidx :
     {
       *(.ARM.exidx* .gnu.linkonce.armexidx.*)
-    } > rom0
+    } > ram
     PROVIDE_HIDDEN (__exidx_end = .);
 
     . = ALIGN(4);
     _etext = .;
-
-    .lnl :
-    {
-      /*. = ALIGN(4);*/
-        __lnl_start__ = .;
-	    *(.lnl*)
-        __lnl_end__ = .;
-    } > lnl
-
-    .rom1 (NOLOAD):
-    {
-        . = ALIGN(8);
-        _rom1 = .;
-        *(.rom1 .rom1.*);
-        . = ALIGN(8);
-        _rom1 = .;
-    } > rom1
-
-    .seeprom (NOLOAD):
-    {
-        . = ALIGN(8);
-        _seeprom = .;
-        *(.seeprom .seeprom.*);
-        . = ALIGN(8);
-        _eseeprom = .;
-    } > seeprom
 
     .relocate : AT (_etext)
     {
@@ -172,16 +144,6 @@ SECTIONS
         . = ALIGN(4);
         _ebss = . ;
         _ezero = .;
-    } > ram
-
-    /* stack section */
-    .stack (NOLOAD):
-    {
-        . = ALIGN(8);
-        _sstack = .;
-        . = . + STACK_SIZE;
-        . = ALIGN(8);
-        _estack = .;
     } > ram
 
     . = ALIGN(4);

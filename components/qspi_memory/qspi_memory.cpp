@@ -447,7 +447,7 @@ void readyRx()
 
 extern "C"
 {
-  void __attribute__((interrupt)) QSPI_Handler()
+  void QSPI_Handler()
   {
     if(QSPI->INTFLAG.bit.DRE)
       readyTx();
