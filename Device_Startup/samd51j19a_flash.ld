@@ -32,12 +32,13 @@ SEARCH_DIR(.)
 /* Memory Spaces Definitions */
 MEMORY
 {
-  rom0     (rx)  : ORIGIN = 0x00000000, LENGTH = 0x00040000
+  rom0     (rx)  : ORIGIN = 0x00000000, LENGTH = 0x0003F800
+  lnl      (rx)  : ORIGIN = 0x0003F800, LENGTH = 0x00000800 /*Load-N-Lock 0-Wait State Caching: 2KB*/
   rom1     (rx)  : ORIGIN = 0x00040000, LENGTH = 0x00018000
-  seeprom  (rx)  : ORIGIN = 0x44000000, LENGTH = 0x00010000
+  qspi     (rx)  : ORIGIN = 0x04000000, LENGTH = 0x01000000
   ram      (rwx) : ORIGIN = 0x20000000, LENGTH = 0x00030000
+  seeprom  (rx)  : ORIGIN = 0x44000000, LENGTH = 0x00010000
   bkupram  (rwx) : ORIGIN = 0x47000000, LENGTH = 0x00002000
-  qspi     (rwx) : ORIGIN = 0x04000000, LENGTH = 0x01000000
 }
 
 /* The stack size used by the application. NOTE: you need to adjust according to your application. */
@@ -105,6 +106,14 @@ SECTIONS
 
     . = ALIGN(4);
     _etext = .;
+
+    .lnl :
+    {
+      /*. = ALIGN(4);*/
+        __lnl_start__ = .;
+	    *(.lnl*)
+        __lnl_end__ = .;
+    } > lnl
 
     .rom1 (NOLOAD):
     {

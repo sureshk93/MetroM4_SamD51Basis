@@ -31,7 +31,7 @@ var8 charmap[0xFF];
   reset(autoUpdate, autoSend);
 }
 
-void DisplayRaw::update(bool autoSend /*= false*/)
+void  __attribute__((section(".lnl"))) DisplayRaw::update(bool autoSend /*= false*/)
 {
   digitsRender = digits;
   segsRender = segs;
@@ -41,7 +41,7 @@ void DisplayRaw::update(bool autoSend /*= false*/)
     send();
 }
 
-void DisplayRaw::send()
+void  __attribute__((section(".lnl"))) DisplayRaw::send()
 {
   // A0-A3 (Digits 0-3)
   _out(0, 2, !_cmp(digitsRender, 0));
@@ -73,7 +73,7 @@ void DisplayRaw::reset(bool autoUpdate /*= false*/, bool autoSend /*= false*/)
     update(autoSend);
 }
 
-void DisplayRaw::setDigit(var8 ind, bool power)
+void  __attribute__((section(".lnl"))) DisplayRaw::setDigit(var8 ind, bool power)
 {
   if(power)
     digits |= (1 << ind);
@@ -86,7 +86,7 @@ bool DisplayRaw::getDigit(var8 ind)
   return !_cmp(digits, ind);
 }
 
-void DisplayRaw::setSeg(var8 ind, bool power)
+void  __attribute__((section(".lnl"))) DisplayRaw::setSeg(var8 ind, bool power)
 {
   if(power)
     segs |= (1 << ind);
@@ -94,7 +94,7 @@ void DisplayRaw::setSeg(var8 ind, bool power)
     segs &= ~(1 << ind);
 }
 
-void DisplayRaw::setChar(var8 ch)
+void  __attribute__((section(".lnl"))) DisplayRaw::setChar(var8 ch)
 {
   segs = charmap[ch];
 }
@@ -104,7 +104,7 @@ bool DisplayRaw::getSeg(var8 ind)
   return _cmp(segs, ind);
 }
 
-void DisplayRaw::setCol(bool power)
+void  __attribute__((section(".lnl"))) DisplayRaw::setCol(bool power)
 {
   colon = power;
 }
@@ -185,12 +185,12 @@ void DisplayRaw::initCharMap()
   charmap['Y'] = charmap['y'] = 0b01101110;
 }
 
-bool DisplayRaw::_cmp(var8 val, var8 bit)
+bool  __attribute__((section(".lnl"))) DisplayRaw::_cmp(var8 val, var8 bit)
 {
   return (val & (1 << bit)) > 0;
 }
 
-void DisplayRaw::_out(var8 port, var32 pin, bool val)
+void  __attribute__((section(".lnl"))) DisplayRaw::_out(var8 port, var32 pin, bool val)
 {
   if(val)
     _outPos(port, pin);
@@ -198,13 +198,13 @@ void DisplayRaw::_out(var8 port, var32 pin, bool val)
     _outNeg(port, pin);
 }
 
-void DisplayRaw::_outPos(var8 port, var32 pin)
+void  __attribute__((section(".lnl"))) DisplayRaw::_outPos(var8 port, var32 pin)
 {
   PORT->Group[port].DIRSET.bit.DIRSET = (1 << pin);
   PORT->Group[port].OUTSET.bit.OUTSET = (1 << pin);
 }
 
-void DisplayRaw::_outNeg(var8 port, var32 pin)
+void  __attribute__((section(".lnl"))) DisplayRaw::_outNeg(var8 port, var32 pin)
 {
   PORT->Group[port].DIRSET.bit.DIRSET = (1 << pin);
   PORT->Group[port].OUTCLR.bit.OUTCLR = (1 << pin);

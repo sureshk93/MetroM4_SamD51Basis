@@ -28,17 +28,17 @@
 #include "types.h"
 
 // Get the pointer to a property of a port
-inline volatile __attribute__ ((const, hot)) var32* ptr32(var32 addr)
+inline volatile __attribute__ ((const, hot, section(".lnl"))) var32* ptr32(var32 addr)
 {
   return (volatile var32*)(addr);
 }
 
-inline volatile __attribute__ ((const, hot)) var16* ptr16(var32 addr)
+inline volatile __attribute__ ((const, hot, section(".lnl"))) var16* ptr16(var32 addr)
 {
   return (volatile var16*)(addr);
 }
 
-inline volatile __attribute__ ((const, hot)) var8* ptr8(var32 addr)
+inline volatile __attribute__ ((const, hot, section(".lnl"))) var8* ptr8(var32 addr)
 {
   return (volatile var8*)(addr);
 }
@@ -59,7 +59,7 @@ inline volatile __attribute__ ((const, cold)) svar8* sptr8(var32 addr)
 }
 
 // Write an arbitrary value to a property of a port
-inline void __attribute__ ((hot)) set32(var32 addr, var32 val = 0, volatile var32* ptr = nullptr)
+inline void __attribute__ ((hot, section(".lnl"))) set32(var32 addr, var32 val = 0, volatile var32* ptr = nullptr)
 {
   if(ptr == nullptr)
   ptr = ptr32(addr);
@@ -76,7 +76,7 @@ inline void __attribute__ ((cold)) sset32(var32 addr, svar32 val = 0, volatile s
 }
 
 // Retrieve an arbitrary value from a property of a port
-inline var32 __attribute__ ((hot)) get32(var32 addr, volatile var32* ptr = nullptr)
+inline var32 __attribute__ ((hot, section(".lnl"))) get32(var32 addr, volatile var32* ptr = nullptr)
 {
   if(ptr == nullptr)
   ptr = ptr32(addr);
@@ -92,7 +92,7 @@ inline svar32 __attribute__ ((cold)) sget32(var32 addr, volatile svar32* ptr = n
   return *ptr;
 }
 
-inline void __attribute__ ((hot)) set16(var32 addr, var32 val = 0, volatile var16* ptr = nullptr)
+inline void __attribute__ ((hot, section(".lnl"))) set16(var32 addr, var32 val = 0, volatile var16* ptr = nullptr)
 {
   if(ptr == nullptr)
   ptr = ptr16(addr);
@@ -109,7 +109,7 @@ inline void __attribute__ ((cold)) sset16(var32 addr, svar32 val = 0, volatile s
 }
 
 // Retrieve an arbitrary value from a property of a port
-inline var16 __attribute__ ((hot)) get16(var32 addr, volatile var16* ptr = nullptr)
+inline var16 __attribute__ ((hot, section(".lnl"))) get16(var32 addr, volatile var16* ptr = nullptr)
 {
   if(ptr == nullptr)
   ptr = ptr16(addr);
@@ -125,7 +125,7 @@ inline svar16 __attribute__ ((cold)) sget16(var32 addr, volatile svar16* ptr = n
   return *ptr;
 }
 
-inline void __attribute__ ((hot)) set8(var32 addr, var8 val = 0, volatile var8* ptr = nullptr)
+inline void __attribute__ ((hot, section(".lnl"))) set8(var32 addr, var8 val = 0, volatile var8* ptr = nullptr)
 {
   if(ptr == nullptr)
   ptr = ptr8(addr);
@@ -142,7 +142,7 @@ inline void __attribute__ ((cold)) sset8(var32 addr, svar8 val = 0, volatile sva
 }
 
 // Retrieve an arbitrary value from a property of a port
-inline var8 __attribute__ ((hot)) get8(var32 addr, volatile var8* ptr = nullptr)
+inline var8 __attribute__ ((hot, section(".lnl"))) get8(var32 addr, volatile var8* ptr = nullptr)
 {
   if(ptr == nullptr)
   ptr = ptr8(addr);
@@ -160,7 +160,7 @@ inline svar8 __attribute__ ((cold)) sget8(var32 addr, volatile svar8* ptr = null
 
 // val1 = LSB
 // val2 = MSB
-constexpr var16 __attribute__ ((const, hot)) concat8to16(var8 val1 = 0, var8 val2 = 0)
+constexpr var16 __attribute__ ((const, hot, section(".lnl"))) concat8to16(var8 val1 = 0, var8 val2 = 0)
 {
   return (val2 << 8) | val1;
 }
@@ -172,7 +172,7 @@ constexpr svar16 __attribute__ ((const, cold)) sconcat8to16(svar8 val1 = 0, svar
 
 // val1 = LSB
 // val2 = MSB
-constexpr var32 __attribute__ ((const, hot)) concat16to32(var16 val1 = 0, var16 val2 = 0)
+constexpr var32 __attribute__ ((const, hot, section(".lnl"))) concat16to32(var16 val1 = 0, var16 val2 = 0)
 {
   return (val2 << 16) | val1;
 }
@@ -184,7 +184,7 @@ constexpr svar32 __attribute__ ((const, cold)) sconcat16to32(svar16 val1 = 0, sv
 
 // val1 = LSB
 // val4 = MSB
-constexpr var32 __attribute__ ((const, hot)) concat8to32(var8 val1 = 0, var8 val2 = 0, var8 val3 = 0, var8 val4 = 0)
+constexpr var32 __attribute__ ((const, hot, section(".lnl"))) concat8to32(var8 val1 = 0, var8 val2 = 0, var8 val3 = 0, var8 val4 = 0)
 {
   return (val4 << 24) | (val3 << 16) | (val2 << 8) | val1;
 }

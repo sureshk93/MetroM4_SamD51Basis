@@ -27,10 +27,21 @@
 
 void Int::boot()
 {
+  enableInt(true);
+}
+
+void Int::enableInt(bool enable)
+{
+  // Skip if already enabled
+  if(EIC->CTRLA.bit.ENABLE == enable)
+    return;
+
   // Enable and use GCLK Clock
-  EIC->CTRLA.reg = EIC_CTRLA_ENABLE;
+  EIC->CTRLA.reg = (enable) ? EIC_CTRLA_ENABLE : 0;
   while(EIC->SYNCBUSY.bit.ENABLE);
 
   // Enable Master Interrupts
-  __enable_irq();
+  (enable)
+    ? __enable_irq()
+    : __disable_irq();
 }

@@ -62,7 +62,7 @@ void RTClock::boot()
   while(RTC->MODE2.SYNCBUSY.bit.ENABLE);
 }
 
-var8 RTClock::getHour()
+var8  __attribute__((section(".lnl"))) RTClock::getHour()
 {
   var8 ret = RTC->MODE2.CLOCK.bit.HOUR & 0b1111;
   while(RTC->MODE2.SYNCBUSY.bit.CLOCKSYNC);
@@ -71,7 +71,7 @@ var8 RTClock::getHour()
   return ret;
 }
 
-var8 RTClock::getMinute()
+var8  __attribute__((section(".lnl"))) RTClock::getMinute()
 {
   var8 ret = RTC->MODE2.CLOCK.bit.MINUTE;
   while(RTC->MODE2.SYNCBUSY.bit.CLOCKSYNC);

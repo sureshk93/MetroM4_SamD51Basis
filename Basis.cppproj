@@ -214,6 +214,12 @@
     <Compile Include="common\types.h">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="components\cache\cache.cpp">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="components\cache\cache.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="components\clocks\clocks.cpp">
       <SubType>compile</SubType>
     </Compile>
@@ -295,6 +301,9 @@
     <Compile Include="handlers.cpp">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="LICENSE">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="main.cpp">
       <SubType>compile</SubType>
     </Compile>
@@ -306,6 +315,7 @@
     <Folder Include="components\clock_freqm" />
     <Folder Include="components\clocks" />
     <Folder Include="components\int" />
+    <Folder Include="components\cache" />
     <Folder Include="components\nvm" />
     <Folder Include="components\timers" />
     <Folder Include="components\supply" />
@@ -325,6 +335,9 @@
       <SubType>compile</SubType>
     </None>
     <None Include="Device_Startup\samd51j19a_sram.ld">
+      <SubType>compile</SubType>
+    </None>
+    <None Include="README.md">
       <SubType>compile</SubType>
     </None>
   </ItemGroup>

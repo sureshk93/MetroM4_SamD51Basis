@@ -30,19 +30,39 @@
 #include "./components/rt_clock/rt_clock.h"
 #include "./components/supply/supply.h"
 #include "./components/nvm/nvm.h"
+#include "./components/cache/cache.h"
 
 #include "./devices/alarm/alarm.h"
+#include "./devices/display/DisplaySimple.h"
 
 void Boot::boot()
 {
+  // Most critical (Getting clocks correct)
   Clocks::boot();
-  Int::boot();
-  NVM::boot();
-  //QspiMemory::boot(); // Dropping QSPI completely for now, it's far too fragile and error-prone
-  Timers::boot();
+
+  // Next most critical in rough order
+
+  // Enabling cache system
+  Cache::boot();
+
+  // Configure power system
   PowerManager::boot();
-  RTClock::boot();
   Supply::boot();
 
-  Alarm::init();
+  // Setting up memories
+  NVM::boot(); // Internal NVM and EEPROM
+  //QspiMemory::boot(); // External NVM // Dropping QSPI completely for now, it's far too fragile and error-prone
+
+  // Least Critical in rough order
+
+  // Timers and related
+  Timers::boot();
+  RTClock::boot();
+
+  // Lastly startup interrupts
+  Int::boot();
+
+  // Post-boot, setup devices
+  Alarm::init(); // Init Alarm
+  DisplayRaw::initCharMap(); // Load charmap into display
 }

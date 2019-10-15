@@ -39,19 +39,19 @@ void Alarm::init()
 }
 
 // Enable Alarm Light
-void Alarm::alarmFlagSet()
+void  __attribute__((section(".lnl"))) Alarm::alarmFlagSet()
 {
   PORT->Group[0].OUTSET.reg = (1 << 18);
 }
 
 // Disable Alarm Light
-void Alarm::alarmFlagClr()
+void  __attribute__((section(".lnl"))) Alarm::alarmFlagClr()
 {
   PORT->Group[0].OUTCLR.reg = (1 << 18);
 }
 
 // Disable alarm light if alarm button pressed
-void Alarm::alarmBtnSample()
+void  __attribute__((section(".lnl"))) Alarm::alarmBtnSample()
 {
   if(PORT->Group[0].IN.bit.IN & (1 << 20))
     alarmFlagClr();

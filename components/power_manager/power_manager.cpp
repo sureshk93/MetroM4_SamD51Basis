@@ -34,19 +34,19 @@ void PowerManager::boot()
   PM->STDBYCFG.bit.FASTWKUP = 3; // Fully use fast wake-up
 }
 
-void PowerManager::enterLastMode()
+void  __attribute__((section(".lnl"))) PowerManager::enterLastMode()
 {
   // Sleep
   __WFI();
 }
 
-void PowerManager::enterIdle()
+void  PowerManager::enterIdle()
 {
   _switchMode(2);
   enterLastMode();
 }
 
-void PowerManager::enterStandby()
+void  __attribute__((section(".lnl"))) PowerManager::enterStandby()
 {
   _switchMode(4);
   enterLastMode();
@@ -70,7 +70,7 @@ void PowerManager::enterOff()
   enterLastMode();
 }
 
-void PowerManager::_switchMode(var32 mode)
+void  __attribute__((section(".lnl"))) PowerManager::_switchMode(var32 mode)
 {
   // Check for current mode, if not in current mode then switch and wait
   if(PM->SLEEPCFG.reg != mode) {
