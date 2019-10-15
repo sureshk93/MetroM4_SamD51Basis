@@ -27,7 +27,7 @@ SEARCH_DIR(.)
  * 1 Block = 16 Pages (8KB) (Division Alignment)
  * 1 Page = 32 QWords (512B) (Section Alignment)
  * 1 QWord = 16 Bytes (Sub-Section Alignment)
- * 1 DWord = 8 Bytes
+ * 1 DWord = 8 Bytes  
  * 1 Word  = 4 Bytes (Default Alignment)
  *
  * Alignments:
@@ -43,7 +43,7 @@ MEMORY
 {
   rom0     (rx)  : ORIGIN = 0x00000000, LENGTH = 0x0003F800 /*Rom Bank 0: Main Bank (For Code)*/
     lnl      (rx)  : ORIGIN = 0x0003F800, LENGTH = 0x00000800 /*Load-N-Lock 0-Wait State Speed: 2KB*/
-
+    
   rom1     (rx)  : ORIGIN = 0x00040000, LENGTH = 0x00018000 /*Rom Bank 1: Aux Bank (For Data)*/
   qspi     (rx)  : ORIGIN = 0x04000000, LENGTH = 0x01000000 /*External NVM: (Additional Aux Data on seperate chip)*/
   ram      (rwx) : ORIGIN = 0x20000000, LENGTH = 0x00030000 /*Ram (Default RAM)*/
@@ -59,11 +59,11 @@ SECTIONS
 {
   /*
     Program Code
-
+    
     Gameplan for .text output section
-
+    
     No support for exceptions or unwinding tables
-
+    
     Vectors go at start
     Program Code is placed on the next QWord
     Thumb/Arm Glue code is placed on the next QWord
@@ -73,48 +73,42 @@ SECTIONS
   .text :
   {
     /*Start at top*/
-    . = ALIGN(4); /*New piece*/
+    . = 0x00000000;
     _stext = .;
     _sfixed = .;
-
+    
     /*Vector Table*/
     /*Place Vectors at start of rom0 as required*/
     KEEP(*(.vectors .vectors.*))
-
+    
     /*Program Code*/
-    /*. = ALIGN(16); New Subsection*/
+    . = ALIGN(16); /*New Subsection*/
     *(.text .text.* .gnu.linkonce.t.*)
-
-    /*Thumb <==> ARM Code Translation Glue*/
-    /*. = ALIGN(16); New Subsection*/
-    *(.glue_7t) *(.glue_7)
-
-    *(.ARM.extab* .gnu.linkonce.armextab.*)
-
+    
     /*C & C++ Special Generated Code, part of main program code*/
-
+    
     /*C++ Setup Code*/
     . = ALIGN(4); /*New piece*/
     KEEP(*(.init))
-
+    
     . = ALIGN(4); /*New piece*/
     __preinit_array_start = .;
     KEEP (*(.preinit_array))
     __preinit_array_end = .;
-
+    
     . = ALIGN(4); /*New piece*/
     __init_array_start = .;
     KEEP (*(SORT(.init_array.*)))
     KEEP (*(.init_array))
     __init_array_end = .;
-
+    
     /*C++ Constructor Code*/
     . = ALIGN(4); /*New piece*/
     KEEP (*crtbegin.o(.ctors))
     KEEP (*(EXCLUDE_FILE (*crtend.o) .ctors))
     KEEP (*(SORT(.ctors.*)))
     KEEP (*crtend.o(.ctors))
-
+    
     /*C++ Teardown Code*/
     . = ALIGN(4); /*New piece*/
     KEEP(*(.fini))
@@ -124,31 +118,35 @@ SECTIONS
     KEEP (*(.fini_array))
     KEEP (*(SORT(.fini_array.*)))
     __fini_array_end = .;
-
+    
     /*C++ Deconstructor Code*/
     . = ALIGN(4); /*New piece*/
     KEEP (*crtbegin.o(.dtors))
     KEEP (*(EXCLUDE_FILE (*crtend.o) .dtors))
     KEEP (*(SORT(.dtors.*)))
     KEEP (*crtend.o(.dtors))
-
+    
+    /*Thumb <==> ARM Code Translation Glue*/
+    . = ALIGN(16); /*New Subsection*/
+    *(.glue_7t) *(.glue_7)
+    
     /*Read-Only/Constant Data, placing in a new page*/
     . = ALIGN(512); /*New Page*/
     *(.rodata .rodata* .gnu.linkonce.r.*)
-
+    
     /*This is for relocating data, place it in it's own page*/
     . = ALIGN(512); /*New Page*/
     _placeRelocate = .;
-
+    
     _efixed = .;
     _etext = .;
   } > rom0 /*These of course go in the main rom bank*/
-
+  
   /*
     Rom 0 Custom Code
-
+    
     Gameplan for .rom0 output section
-
+    
     This is sort of a workarea for program-specific usage unrelated to generated
     code. It needs to go into it's own block.
   */
@@ -159,12 +157,12 @@ SECTIONS
     *(.rom0*)
     _erom0 = .;
   } > rom0
-
+  
   /*
     Load-N-Lock 0-Wait State Speed
-
+    
     Gameplan for .lnl output section
-
+    
     LNL is placed in it's own reserved memory area of a specific size in rom0. Space is
     immensely cramped and every byte counts. No alignment will be done.
   */
@@ -175,12 +173,12 @@ SECTIONS
     *(.lnl*)
     _elnl = .;
   } > lnl /*Goes into it's own specific area*/
-
+  
   /*
     Rom 1 Custom Code
-
+    
     Gameplan for .rom1 output section
-
+    
     Rom Bank 1 is more relaxed given the entire bank is for program usage.
     This needs to be placed after the first page. The first page is reserved
     for program-specific header data and work area.
@@ -192,12 +190,12 @@ SECTIONS
     *(.rom1*)
     _erom1 = .;
   } > rom1 /*Goes into rom bank 1*/
-
+  
   /*
     QSPI Custom Code
-
+    
     Gameplan for .qspi output section
-
+    
     QSPI is similar to ROM1 in that it's just an area that can be used
     for custom usage or work area.
   */
@@ -208,12 +206,12 @@ SECTIONS
     *(.qspi*)
     _eqspi = .;
   } > qspi /*Goes into QSPI*/
-
+  
   /*
     Uninitialized Data
-
+    
     Gameplan for .bss output section
-
+    
     Uninitialized data goes into main RAM at the start
   */
   .bss (NOLOAD) :
@@ -222,22 +220,22 @@ SECTIONS
     _sbss = . ;
     _szero = .;
     *(.bss .bss.*) /*Place BSS Data at start of RAM*/
-
+    
     . = ALIGN(4); /*New piece*/
     *(COMMON) /*Place common data after*/
     _ebss = . ;
     _ezero = .;
-
+    
     /*Relocate data comes after bss*/
     . = ALIGN(4); /*New piece*/
     _relocateStart = .;
   } > ram
-
+  
   /*
     Relocate data
-
+    
     Gameplan for .relocate output section
-
+    
     This needs to be placed at rom0 in it's own defined section. It will
     be copied to the end of bss.
   */
@@ -246,35 +244,35 @@ SECTIONS
     . = ALIGN(4); /*New piece*/
     _srelocate = .;
     *(.data .data.*);
-
+    
     . = ALIGN(4); /*New Piece*/
     *(.ramfunc .ramfunc.*);
     _erelocate = .;
   } > ram /*Place in RAM*/
-
+  
   /*
     Stack data
-
+    
     Gameplan for .stack output section
-
+    
     Placed at end of RAM an empty area large enough for the stack
   */
   .stack (NOLOAD):
   {
     . = ALIGN(8); /*New larger piece*/
     _sstack = .; /*Begin Stack*/
-
+    
     . = . + STACK_SIZE; /*Insert large blank area for stack*/
-
+    
     . = ALIGN(8); /*New larger piece*/
     _estack = .; /*End stack placement*/
   } > ram
-
+  
   /*
     SEEPROM Data
-
+    
     Gameplan for .seeprom output section
-
+    
     The SEEPROM section is like rom1 just byte-writable rather than
     block/page eraseable/writable. Unlike ROM1 however SEEPROM can start
     at the beginning.
@@ -286,12 +284,12 @@ SECTIONS
     *(.seeprom*)
     _eseeprom = .;
   } > seeprom /*Goes into seeprom area*/
-
+  
   /*
     Custom Backup RAM
-
+    
     Gameplan for .bkupram output section
-
+    
     Like ROM1 and SEEPROM, this is another potential usage area.
   */
   .bkupram (NOLOAD):
@@ -301,7 +299,7 @@ SECTIONS
     *(.bkupram*)
     _ebkupram = .;
   } > bkupram /*Goes into bkupram area*/
-
+  
   . = ALIGN(4); /*New piece*/
   _end = . ; /*End of everything*/
 }

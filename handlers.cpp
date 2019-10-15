@@ -50,7 +50,7 @@ void __attribute__((hot)) onTimerS()
 extern "C"
 {
   // Ticks every 5ms
-  void __attribute__((hot,section(".lnl"))) TC0_Handler()
+  void __attribute__((interrupt,hot,section(".lnl"))) TC0_Handler()
   {
     countMS += 5;
     onTimer5MS(); // Call every 5ms
@@ -64,7 +64,7 @@ extern "C"
     TC0->COUNT16.INTFLAG.bit.MC0 = true;
   }
 
-  void __attribute__((hot,section(".lnl"))) RTC_Handler()
+  void __attribute__((interrupt,hot,section(".lnl"))) RTC_Handler()
   {
     Alarm::alarmFlagSet();
     RTC->MODE2.INTFLAG.bit.ALARM0 = true;
