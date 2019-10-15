@@ -85,7 +85,7 @@ bool DisplaySimple::getDigit(var8 ind)
   return digits[ind].getDigit(ind);
 }
 
-void DisplaySimple::setSeg(var8 digit, var8 ind, bool power)
+void  __attribute__((section(".lnl"))) DisplaySimple::setSeg(var8 digit, var8 ind, bool power)
 {
   digits[digit].setSeg(ind, power);
 }
@@ -95,13 +95,13 @@ void  __attribute__((section(".lnl"))) DisplaySimple::setChar(var8 digit, var8 c
   digits[digit].setChar(ch);
 }
 
-void DisplaySimple::setStr(const var8* str)
+void  __attribute__((section(".lnl"))) DisplaySimple::setStr(const var8* str)
 {
   for(var8 i = 0; i < digitCount; i++)
     digits[i].setChar(str[i]);
 }
 
-void DisplaySimple::setStr(const char* str)
+void  __attribute__((section(".lnl"))) DisplaySimple::setStr(const char* str)
 {
   for(var8 i = 0; i < digitCount; i++)
     digits[i].setChar(str[i]);
