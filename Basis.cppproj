@@ -334,9 +334,6 @@
     <None Include="Device_Startup\samd51j19a_flash.ld">
       <SubType>compile</SubType>
     </None>
-    <None Include="Device_Startup\samd51j19a_sram.ld">
-      <SubType>compile</SubType>
-    </None>
     <None Include="README.md">
       <SubType>compile</SubType>
     </None>
