@@ -78,19 +78,19 @@
 class Clocks
 {
 public:
-  static void __attribute__((cold)) boot();
-  static void __attribute__((cold)) _enable_gen(var8 ind, var8 src, var16 div = 1);
-  static void __attribute__((cold)) _enable_pch(var8 ind, var8 src);
-  static void __attribute__((cold)) _enable_dpll(var8 ind, var32 ldr);
+  static void boot();
+  static void _enable_gen(var8 ind, var8 src, var16 div = 1);
+  static void _enable_pch(var8 ind, var8 src);
+  static void _enable_dpll(var8 ind, var32 ldr);
 
 private:
-  static void __attribute__((cold)) boot_osc32k();
-  static void __attribute__((cold)) boot_dfll();
-  static void __attribute__((cold)) boot_gens_initial();
-  static void __attribute__((cold)) boot_dpll();
-  static void __attribute__((cold)) boot_gens_post();
-  static void __attribute__((cold)) boot_mclk();
-  static void __attribute__((cold)) boot_post();
+  static void boot_osc32k();
+  static void boot_dfll();
+  static void boot_gens_initial();
+  static void boot_dpll();
+  static void boot_gens_post();
+  static void boot_mclk();
+  static void boot_post();
 };
 
 #endif //__CLOCKS_H__

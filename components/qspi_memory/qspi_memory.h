@@ -56,7 +56,7 @@ enum : var16 {
 class QspiMemory
 {
 public:
-  static void __attribute__((cold)) boot();
+  static void boot();
 
   static void modeSPI();
   static void modeMemory();
@@ -149,17 +149,26 @@ public:
   static void txDummy(var8 count);
 
   static bool completion;
+  static void doCompletion();
+  static void readyTx();
+  static void readyRx();
 
 private:
   // Setup physical pins for QSPI
-  static void __attribute__((cold)) _setupPinIn(var8 port, var8 pin);
-  static void __attribute__((cold)) _setupPinOut(var8 port, var8 pin);
+  static void _setupPinIn(var8 port, var8 pin);
+  static void _setupPinOut(var8 port, var8 pin);
 
   // Read sync (Used for instruction changes and loading)
   static void _instrReadSync();
 
   // Dummy variable for read-sync
   static var32 dummy;
+
+  static var16 txBuffer[300];
+  static var16 rxBuffer[50];
+
+  static var16* txBufferPtr;
+  static var16* rxBufferPtr;
 };
 
 #endif

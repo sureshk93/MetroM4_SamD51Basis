@@ -26,15 +26,7 @@
 #include "sam.h"
 #include "../../common/data.h"
 
-static var16 txBuffer[300];
-static var16 rxBuffer[50];
-
-static var16* txBufferPtr;
-static var16* rxBufferPtr;
-
-var32 QspiMemory::dummy = 0;
-
-void QspiMemory::boot()
+void __attribute__((cold)) QspiMemory::boot()
 {
   // Skip clearing out buffers, just mark the first
   // element the end. Setup pointers to start
@@ -365,7 +357,7 @@ void QspiMemory::txDummy(var8 count)
 
 bool QspiMemory::completion = true;
 
-void QspiMemory::_setupPinOut(var8 port, var8 pin)
+void __attribute__((cold)) QspiMemory::_setupPinOut(var8 port, var8 pin)
 {
   PORT->Group[port].DIRSET.bit.DIRSET = (1 << pin);
   PORT->Group[port].OUTCLR.bit.OUTCLR = (1 << pin);
@@ -377,7 +369,7 @@ void QspiMemory::_setupPinOut(var8 port, var8 pin)
     PORT->Group[port].PMUX[pin / 2].bit.PMUXO = 7;
 }
 
-void QspiMemory::_setupPinIn(var8 port, var8 pin)
+void __attribute__((cold)) QspiMemory::_setupPinIn(var8 port, var8 pin)
 {
   PORT->Group[port].CTRL.bit.SAMPLING = (1 << pin);
   PORT->Group[port].DIRCLR.bit.DIRCLR = (1 << pin);
@@ -395,7 +387,7 @@ void QspiMemory::_instrReadSync()
   dummy = QSPI->INSTRFRAME.reg;
 }
 
-void doCompletion()
+void QspiMemory::doCompletion()
 {
   QspiMemory::completion = true;
   QSPI->INTFLAG.reg = QSPI_INTFLAG_DRE | QSPI_INTFLAG_RXC;
@@ -405,7 +397,7 @@ void doCompletion()
   *rxBufferPtr = QSPI_BUFFER_END;
 }
 
-void readyTx()
+void QspiMemory::readyTx()
 {
   // If completion then
   // This is a false write, don't actually send it
@@ -429,7 +421,7 @@ void readyTx()
 }
 
 
-void readyRx()
+void QspiMemory::readyRx()
 {
   // If completion then
   // This is a false read, don't actually save it
@@ -450,9 +442,17 @@ extern "C"
   void __attribute__((interrupt)) QSPI_Handler()
   {
     if(QSPI->INTFLAG.bit.DRE)
-      readyTx();
+      QspiMemory::readyTx();
 
     if(QSPI->INTFLAG.bit.RXC)
-      readyRx();
+      QspiMemory::readyRx();
   }
 };
+
+var16 QspiMemory::txBuffer[300];
+var16 QspiMemory::rxBuffer[50];
+
+var16* QspiMemory::txBufferPtr;
+var16* QspiMemory::rxBufferPtr;
+
+var32 QspiMemory::dummy = 0;

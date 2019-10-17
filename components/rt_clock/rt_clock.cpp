@@ -25,7 +25,7 @@
 #include "sam.h"
 #include "../../common/compile_time_date.h"
 
-void RTClock::boot()
+void __attribute__((cold)) RTClock::boot()
 {
   // Enable clock mode and synchronized reading. Ensure RTC is clocked by a 1hz clock. Use AM/PM 12-hour time.
   RTC->MODE2.CTRLA.reg = RTC_MODE2_CTRLA_MODE_CLOCK | RTC_MODE2_CTRLA_CLOCKSYNC | RTC_MODE2_CTRLA_PRESCALER(0xB) |

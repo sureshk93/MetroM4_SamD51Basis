@@ -25,7 +25,7 @@
 #include "sam.h"
 #include "../clocks/clocks.h"
 
-void PowerManager::boot()
+void __attribute__((cold)) PowerManager::boot()
 {
   // Ready default sleep mode standby
   PM->SLEEPCFG.reg = PM_SLEEPCFG_SLEEPMODE_STANDBY;
@@ -46,7 +46,7 @@ void  PowerManager::enterIdle()
   enterLastMode();
 }
 
-void  __attribute__((section(".lnl"))) PowerManager::enterStandby()
+void  __attribute__((hot,section(".lnl"))) PowerManager::enterStandby()
 {
   _switchMode(4);
   enterLastMode();
@@ -70,7 +70,7 @@ void PowerManager::enterOff()
   enterLastMode();
 }
 
-void  __attribute__((section(".lnl"))) PowerManager::_switchMode(var32 mode)
+void  __attribute__((hot,section(".lnl"))) PowerManager::_switchMode(var32 mode)
 {
   // Check for current mode, if not in current mode then switch and wait
   if(PM->SLEEPCFG.reg != mode) {

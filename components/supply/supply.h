@@ -27,7 +27,7 @@
 class Supply
 {
 public:
-  static void __attribute__((cold)) boot();
+  static void boot();
 
   static void powerCPUTemp();
   static void powerCompTemp();

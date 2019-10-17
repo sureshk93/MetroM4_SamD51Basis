@@ -23,15 +23,14 @@
 
 #include "DisplayRaw.h"
 #include "sam.h"
-
-var8 charmap[0xFF];
+#include "../../components/nvm/nvm.h"
 
  DisplayRaw::DisplayRaw(bool autoUpdate /*= true*/, bool autoSend /*= false*/)
 {
   reset(autoUpdate, autoSend);
 }
 
-void  __attribute__((section(".lnl"))) DisplayRaw::update(bool autoSend /*= false*/)
+void  __attribute__((hot, section(".lnl"))) DisplayRaw::update(bool autoSend /*= false*/)
 {
   digitsRender = digits;
   segsRender = segs;
@@ -41,7 +40,7 @@ void  __attribute__((section(".lnl"))) DisplayRaw::update(bool autoSend /*= fals
     send();
 }
 
-void  __attribute__((section(".lnl"))) DisplayRaw::send()
+void  __attribute__((hot, section(".lnl"))) DisplayRaw::send()
 {
   // A0-A3 (Digits 0-3)
   _out(0, 2, !_cmp(digitsRender, 0));
@@ -73,7 +72,7 @@ void DisplayRaw::reset(bool autoUpdate /*= false*/, bool autoSend /*= false*/)
     update(autoSend);
 }
 
-void  __attribute__((section(".lnl"))) DisplayRaw::setDigit(var8 ind, bool power)
+void DisplayRaw::setDigit(var8 ind, bool power)
 {
   if(power)
     digits |= (1 << ind);
@@ -86,7 +85,7 @@ bool DisplayRaw::getDigit(var8 ind)
   return !_cmp(digits, ind);
 }
 
-void  __attribute__((section(".lnl"))) DisplayRaw::setSeg(var8 ind, bool power)
+void DisplayRaw::setSeg(var8 ind, bool power)
 {
   if(power)
     segs |= (1 << ind);
@@ -94,7 +93,7 @@ void  __attribute__((section(".lnl"))) DisplayRaw::setSeg(var8 ind, bool power)
     segs &= ~(1 << ind);
 }
 
-void  __attribute__((section(".lnl"))) DisplayRaw::setChar(var8 ch)
+void  __attribute__((hot, section(".lnl"))) DisplayRaw::setChar(var8 ch)
 {
   segs = charmap[ch];
 }
@@ -104,7 +103,7 @@ bool DisplayRaw::getSeg(var8 ind)
   return _cmp(segs, ind);
 }
 
-void  __attribute__((section(".lnl"))) DisplayRaw::setCol(bool power)
+void  __attribute__((hot, section(".lnl"))) DisplayRaw::setCol(bool power)
 {
   colon = power;
 }
@@ -117,13 +116,20 @@ bool DisplayRaw::getCol()
 void DisplayRaw::modifyCharmap(var8 ch, var8 data)
 {
   charmap[ch] = data;
+
+  // Commit changes
+  NVM::seepromFlush();
 }
 
 void DisplayRaw::initCharMap()
 {
+  // Do nothing if it's already formatted
+  if(formatCode == formatCodeCompare)
+    return;
+
   // Insert spaces into all charmap elements
   for(var8 i = 0; i < 0xFF; i++)
-  charmap[i] = 0b00000000;
+    charmap[i] = 0b00000000;
 
   // Define Charmap elements which can be defined
   // on a 7-segment display, the rest will be a space
@@ -183,14 +189,19 @@ void DisplayRaw::initCharMap()
   charmap['u'] = 0b00011100;
   charmap['W'] = charmap['w'] = 0b00101010;
   charmap['Y'] = charmap['y'] = 0b01101110;
+
+  formatCode = formatCodeCompare;
+
+  // Commit changes
+  NVM::seepromFlush();
 }
 
-bool  __attribute__((section(".lnl"))) DisplayRaw::_cmp(var8 val, var8 bit)
+bool  __attribute__((hot, section(".lnl"))) DisplayRaw::_cmp(var8 val, var8 bit)
 {
   return (val & (1 << bit)) > 0;
 }
 
-void  __attribute__((section(".lnl"))) DisplayRaw::_out(var8 port, var32 pin, bool val)
+void  __attribute__((hot, section(".lnl"))) DisplayRaw::_out(var8 port, var32 pin, bool val)
 {
   if(val)
     _outPos(port, pin);
@@ -198,7 +209,7 @@ void  __attribute__((section(".lnl"))) DisplayRaw::_out(var8 port, var32 pin, bo
     _outNeg(port, pin);
 }
 
-void  __attribute__((section(".lnl"))) DisplayRaw::_outPos(var8 port, var32 pin)
+void  __attribute__((hot, section(".lnl"))) DisplayRaw::_outPos(var8 port, var32 pin)
 {
   PORT->Group[port].DIRSET.bit.DIRSET = (1 << pin);
   PORT->Group[port].OUTSET.bit.OUTSET = (1 << pin);
@@ -210,4 +221,6 @@ void  __attribute__((section(".lnl"))) DisplayRaw::_outNeg(var8 port, var32 pin)
   PORT->Group[port].OUTCLR.bit.OUTCLR = (1 << pin);
 }
 
-DisplayRaw displayRaw = DisplayRaw();
+DisplayRaw __attribute__((section(".bkupram"))) DisplayRaw::inst = DisplayRaw();
+var8 __attribute__((section(".seeprom"))) DisplayRaw::formatCode = 0;
+var8 __attribute__((section(".seeprom"))) DisplayRaw::charmap[0xFF];

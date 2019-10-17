@@ -24,7 +24,7 @@
 #include "timers.h"
 #include "sam.h"
 
-void Timers::boot()
+void __attribute__((cold)) Timers::boot()
 {
   // Timer 0 16-bit (1MHz Clock)
   // Interrupt every 5000x (5ms)

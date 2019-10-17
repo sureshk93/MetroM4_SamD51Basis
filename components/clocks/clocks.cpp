@@ -26,7 +26,7 @@
 #include "../../common/named_phctrl.h"
 #include "../../common/named_gens.h"
 
-void  Clocks::boot()
+void __attribute__((cold)) Clocks::boot()
 {
   Clocks::boot_osc32k();
   Clocks::boot_dfll();
@@ -38,7 +38,7 @@ void  Clocks::boot()
 }
 
 //  Enable  and  configure  32KHz  Crystal
-void  Clocks::boot_osc32k()
+void __attribute__((cold)) Clocks::boot_osc32k()
 {
   //  Enable  RTC  Clock  and  have  it  use  32K  crystal
   OSC32KCTRL->RTCCTRL.reg  =  OSC32KCTRL_RTCCTRL_RTCSEL(4);
@@ -60,7 +60,7 @@ void  Clocks::boot_osc32k()
 }
 
 //  Enable  and  configure  48MHz
-void  Clocks::boot_dfll()
+void __attribute__((cold)) Clocks::boot_dfll()
 {
   //  Configure  DFLL  to  be  additionally  stable,  use  USB  as  clock  recovery  if  avail  and  ensure  it  doesn't
   //  actually  start  until  it's  already  been  finely  tuned
@@ -75,7 +75,7 @@ void  Clocks::boot_dfll()
 }
 
 //  Initial  setup  of  GCLK  Generators
-void  Clocks::boot_gens_initial()
+void __attribute__((cold)) Clocks::boot_gens_initial()
 {
   //  Enable  Generator  2  to  be  DFLL  48MHz  (48MHz) Max 200 MHz
   Clocks::_enable_gen(GEN_48MHz,  GCLK_GENCTRL_SRC_DFLL);
@@ -110,14 +110,14 @@ void  Clocks::boot_gens_initial()
 }
 
 //  Setup  DPLL0  to  output  120MHz  &  DPLL1  to  output  100MHz
-void  Clocks::boot_dpll()
+void __attribute__((cold)) Clocks::boot_dpll()
 {
   Clocks::_enable_dpll(0,  119);
   Clocks::_enable_dpll(1,  99);
 }
 
 //  Pull  DPLL  0  &  1  into  generators  0  &  1
-void  Clocks::boot_gens_post()
+void __attribute__((cold)) Clocks::boot_gens_post()
 {
   //  Enable  Generator  1  to  be  DPLL  1  (100MHz)
   Clocks::_enable_gen(GEN_100MHz,  GCLK_GENCTRL_SRC_DPLL1); // Max 200MHz
@@ -138,7 +138,7 @@ void  Clocks::boot_gens_post()
 }
 
 //  Select  Individual  Component  Main  Clock  Power
-void  Clocks::boot_mclk()
+void __attribute__((cold)) Clocks::boot_mclk()
 {
   MCLK->AHBMASK.reg  =  MCLK_AHBMASK_HPB0  |  MCLK_AHBMASK_HPB1  |  MCLK_AHBMASK_HPB2  |  MCLK_AHBMASK_HPB3  |
   MCLK_AHBMASK_DSU  |		MCLK_AHBMASK_NVMCTRL  |
@@ -161,7 +161,7 @@ void  Clocks::boot_mclk()
 }
 
 // Setup power-saving configuration for the clocks
-void Clocks::boot_post()
+void __attribute__((cold)) Clocks::boot_post()
 {
   // Mark critical clocks to run always even in standby
   OSCCTRL->DFLLCTRLA.bit.RUNSTDBY = true;
@@ -180,19 +180,19 @@ void Clocks::boot_post()
 }
 
 //  Enables  and  configures  a  generator
-void  Clocks::_enable_gen(var8  ind,  var8  src,  var16  div  /*=  1*/)
+void __attribute__((cold)) Clocks::_enable_gen(var8  ind,  var8  src,  var16  div  /*=  1*/)
 {
   GCLK->GENCTRL[ind].reg  =  GCLK_GENCTRL_IDC  |  GCLK_GENCTRL_GENEN  |  src  |  GCLK_GENCTRL_DIV(div);
   while(GCLK->GENCTRL[ind].bit.SRC  !=  src  ||  GCLK->GENCTRL[ind].bit.GENEN  ==  false);
 }
 
-void  Clocks::_enable_pch(var8  ind,  var8  src)
+void __attribute__((cold)) Clocks::_enable_pch(var8  ind,  var8  src)
 {
   GCLK->PCHCTRL[ind].reg  =  GCLK_PCHCTRL_GEN(src)  |  GCLK_PCHCTRL_CHEN;
   while(GCLK->PCHCTRL[ind].bit.GEN  !=  src  ||  GCLK->PCHCTRL[ind].bit.CHEN  ==  false);
 }
 
-void  Clocks::_enable_dpll(var8  ind,  var32  ldr)
+void __attribute__((cold)) Clocks::_enable_dpll(var8  ind,  var32  ldr)
 {
   //  DPLL  n  uses  GCLK  Input  and  bypasses  fine  lock  stage
   OSCCTRL->Dpll[ind].DPLLCTRLB.reg  =  OSCCTRL_DPLLCTRLB_REFCLK_GCLK  |  OSCCTRL_DPLLCTRLB_LBYPASS;

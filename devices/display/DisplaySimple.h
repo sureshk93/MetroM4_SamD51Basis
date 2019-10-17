@@ -33,38 +33,38 @@ public:
   DisplaySimple(bool autoUpdate = true, bool autoSend = false);
 
   // Copy working area to presentation area and send
-  void __attribute__((hot)) update(bool autoSend = false);
-  void __attribute__((hot)) updateOne(var8 ind, bool autoSend = false);
+  void update(bool autoSend = false);
+  void updateOne(var8 ind, bool autoSend = false);
 
   // Sends presentation area to device
-  void __attribute__((hot)) send(var8 ind);
+  void send(var8 ind);
 
   // Sends next digit, cycles around 0-4
-  void __attribute__((hot)) sendNext();
+  void sendNext();
 
   // Reset this class instance and send changes to device
   void reset(bool autoUpdate = false, bool autoSend = false);
 
   // Digits 0-3
   // ----4321
-  void __attribute__((hot)) setDigit(var8 ind, bool power);
+  void setDigit(var8 ind, bool power);
   bool getDigit(var8 ind);
 
   // Digit Segments 0-7 (A-G + DP)
   // PGFEDCBA
-  void __attribute__((hot)) setSeg(var8 digit, var8 ind, bool power);
-  void __attribute__((hot)) setChar(var8 digit, var8 ch);
+  void setSeg(var8 digit, var8 ind, bool power);
+  void setChar(var8 digit, var8 ch);
   bool getSeg(var8 digit, var8 ind);
 
-  void __attribute__((hot)) setStr(const var8* str);
-  void __attribute__((hot)) setStr(const char* str);
+  void setStr(const var8* str);
+  void setStr(const char* str);
 
   // Colon
-  void __attribute__((hot)) setCol(bool power);
-  bool __attribute__((hot)) getCol();
-  void __attribute__((hot)) doTick();
+  void setCol(bool power);
+  bool getCol();
+  void doTick();
 
-  void __attribute__((hot)) doClockUpdate();
+  void doClockUpdate();
 
   // Get first digit raw
   // Each digit can actually be used as a layer
@@ -74,12 +74,11 @@ public:
   DisplayRaw digits[4];
   var8 digitNext;
   static constexpr var8 digitCount = 4;
+  static DisplaySimple inst;
 
   bool autoClockEn = false;
   bool autoTickEn = false;
   bool autoSendEn = true;
 };
-
-extern DisplaySimple displaySimple;
 
 #endif //__DISPLAYSIMPLE_H__

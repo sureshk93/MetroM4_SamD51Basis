@@ -80,7 +80,7 @@ class NVM
 {
 public:
   // Only needs to boot NVM and SEEPROM, ENVM was already booted by QSPI
-  static void __attribute__((cold)) boot();
+  static void boot();
 
   // Internal NVM Memory
   static void nvmLowPower();

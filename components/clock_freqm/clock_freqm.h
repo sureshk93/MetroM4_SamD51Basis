@@ -31,7 +31,7 @@ class ClockFreqm
 public:
   // Max Ref 100 MHz
   // Max To 200 MHZ
-  static svar32 __attribute__((cold)) meausre(var8 ref, var8 to);
+  static svar32 meausre(var8 ref, var8 to);
 };
 
 #endif //__CLOCKFREQM_H__

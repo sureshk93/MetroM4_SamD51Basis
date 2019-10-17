@@ -24,7 +24,7 @@
 #include "supply.h"
 #include "sam.h"
 
-void Supply::boot()
+void __attribute__((cold)) Supply::boot()
 {
   // Enable CPU Temp and route it to ADC for measuring
   SUPC->VREF.reg = SUPC_VREF_TSSEL | SUPC_VREF_TSEN;

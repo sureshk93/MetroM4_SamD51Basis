@@ -24,7 +24,7 @@
 #include "nvm.h"
 #include "sam.h"
 
-void NVM::boot()
+void __attribute__((cold)) NVM::boot()
 {
   // Enter and exist standby mode based on cpu standby state
   // If 2 jobs occur in the same bank, it's ok to pause the first one

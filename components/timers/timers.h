@@ -34,7 +34,7 @@
 class Timers
 {
 public:
-  static void __attribute__((cold)) boot();
+  static void boot();
 };
 
 #endif //__TIMERS_H__

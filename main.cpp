@@ -28,11 +28,11 @@ int __attribute__((cold)) main(void)
   Boot::boot();
 
   // Enable Auto Colon & Time Tick
-  displaySimple.autoTickEn = true;
-  displaySimple.autoClockEn = true;
+  DisplaySimple::inst.autoTickEn = true;
+  DisplaySimple::inst.autoClockEn = true;
 
   // Do initial clock update
-  displaySimple.doClockUpdate();
+  DisplaySimple::inst.doClockUpdate();
 
   loop();
 

@@ -36,7 +36,7 @@
 class PowerManager
 {
 public:
-  static void __attribute__((cold)) boot();
+  static void boot();
 
   static void enterLastMode();
 
@@ -54,7 +54,7 @@ public:
    * Logic Retained
    * SRAM power can be configured
   */
-  static void __attribute__((hot)) enterStandby();
+  static void enterStandby();
 
   /*
    * Hibernate (IO Rentention)
@@ -77,7 +77,7 @@ public:
   static void enterOff();
 
 private:
-  static void __attribute__((hot)) _switchMode(var32 mode);
+  static void _switchMode(var32 mode);
 };
 
 #endif

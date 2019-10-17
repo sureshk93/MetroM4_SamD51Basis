@@ -29,23 +29,23 @@
   reset(autoUpdate, autoSend);
 }
 
-void  __attribute__((section(".lnl"))) DisplaySimple::update(bool autoSend /*= false*/)
+void  __attribute__((hot, section(".lnl"))) DisplaySimple::update(bool autoSend /*= false*/)
 {
   for(var8 i = 0; i < digitCount; i++)
     updateOne(i, autoSend);
 }
 
-void  __attribute__((section(".lnl"))) DisplaySimple::updateOne(var8 ind, bool autoSend /*= false*/)
+void  __attribute__((hot, section(".lnl"))) DisplaySimple::updateOne(var8 ind, bool autoSend /*= false*/)
 {
   digits[ind].update(autoSend);
 }
 
-void  __attribute__((section(".lnl"))) DisplaySimple::send(var8 ind)
+void  __attribute__((hot, section(".lnl"))) DisplaySimple::send(var8 ind)
 {
   digits[ind].send();
 }
 
-void  __attribute__((section(".lnl"))) DisplaySimple::sendNext()
+void  __attribute__((hot, section(".lnl"))) DisplaySimple::sendNext()
 {
   if(!autoSendEn)
     return;
@@ -75,7 +75,7 @@ void DisplaySimple::reset(bool autoUpdate /*= false*/, bool autoSend /*= false*/
     update(autoSend);
 }
 
-void  DisplaySimple::setDigit(var8 ind, bool power)
+void DisplaySimple::setDigit(var8 ind, bool power)
 {
   digits[ind].setDigit(ind, power);
 }
@@ -90,7 +90,7 @@ void DisplaySimple::setSeg(var8 digit, var8 ind, bool power)
   digits[digit].setSeg(ind, power);
 }
 
-void  __attribute__((section(".lnl"))) DisplaySimple::setChar(var8 digit, var8 ch)
+void  __attribute__((hot, section(".lnl"))) DisplaySimple::setChar(var8 digit, var8 ch)
 {
   digits[digit].setChar(ch);
 }
@@ -112,7 +112,7 @@ bool DisplaySimple::getSeg(var8 digit, var8 ind)
   return digits[digit].getSeg(ind);
 }
 
-void __attribute__((section(".lnl"))) DisplaySimple::setCol(bool power)
+void __attribute__((hot, section(".lnl"))) DisplaySimple::setCol(bool power)
 {
   digits[3].setCol(power);
 }
@@ -122,7 +122,7 @@ bool DisplaySimple::getCol()
   return digits[3].getCol();
 }
 
-void __attribute__((section(".lnl"))) DisplaySimple::doTick()
+void __attribute__((hot, section(".lnl"))) DisplaySimple::doTick()
 {
   if(!autoTickEn)
     return;
@@ -132,7 +132,7 @@ void __attribute__((section(".lnl"))) DisplaySimple::doTick()
   digits[3].colonRender = getCol();
 }
 
-void DisplaySimple::doClockUpdate()
+void __attribute__((hot, section(".lnl"))) DisplaySimple::doClockUpdate()
 {
   if(!autoClockEn)
     return;
@@ -142,15 +142,15 @@ void DisplaySimple::doClockUpdate()
 
   var8 hour1 = hour / 10;
   if(hour1 == 0)
-    displaySimple.setChar(0, ' ');
+    inst.setChar(0, ' ');
   else
-    displaySimple.setChar(0, hour1);
+    inst.setChar(0, hour1);
 
-  displaySimple.setChar(1, hour % 10);
-  displaySimple.setChar(2, min / 10);
-  displaySimple.setChar(3, min % 10);
+  inst.setChar(1, hour % 10);
+  inst.setChar(2, min / 10);
+  inst.setChar(3, min % 10);
 
-  displaySimple.update();
+  inst.update();
 }
 
 DisplayRaw DisplaySimple::getRaw()
@@ -158,4 +158,4 @@ DisplayRaw DisplaySimple::getRaw()
   return digits[0];
 }
 
-DisplaySimple displaySimple = DisplaySimple();
+DisplaySimple __attribute__((section(".bkupram"))) DisplaySimple::inst  = DisplaySimple();

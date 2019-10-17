@@ -26,7 +26,7 @@
 #include "../../common/named_gens.h"
 #include "../../common/named_phctrl.h"
 
-svar32 ClockFreqm::meausre(var8 ref, var8 to)
+svar32 __attribute__((cold)) ClockFreqm::meausre(var8 ref, var8 to)
 {
   // Enable Main Clock
   MCLK->APBAMASK.bit.FREQM_ = true;

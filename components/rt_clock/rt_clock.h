@@ -29,7 +29,7 @@
 class RTClock
 {
 public:
-  static void __attribute__((cold)) boot();
+  static void boot();
 
   static var8 getHour();
   static var8 getMinute();

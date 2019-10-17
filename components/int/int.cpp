@@ -25,7 +25,7 @@
 #include "int.h"
 #include "../../common/types.h"
 
-void Int::boot()
+void __attribute__((cold)) Int::boot()
 {
   enableInt(true);
 }

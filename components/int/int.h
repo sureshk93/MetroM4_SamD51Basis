@@ -28,7 +28,7 @@
 class Int
 {
 public:
-  static void __attribute__((cold)) boot();
+  static void boot();
   static void enableInt(bool enable);
 };
 

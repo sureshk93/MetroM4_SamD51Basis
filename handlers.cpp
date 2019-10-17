@@ -28,23 +28,23 @@
 #include "./devices/alarm/alarm.h"
 #include "./components/power_manager/power_manager.h"
 
-var16 countMS = 0;
+var16 __attribute__((section(".bkupram"))) countMS = 0;
 
 // Called every 5ms
 void __attribute__((hot,section(".lnl"))) onTimer5MS()
 {
   // Send next digit every 5ms
-  displaySimple.sendNext();
+  DisplaySimple::inst.sendNext();
 }
 
 // Called every 1s
-void __attribute__((hot)) onTimerS()
+void __attribute__((hot,section(".lnl"))) onTimerS()
 {
   // Do colon tick if enabled
-  displaySimple.doTick();
+  DisplaySimple::inst.doTick();
 
   // Set time from RTC Clock if enabled
-  displaySimple.doClockUpdate();
+  DisplaySimple::inst.doClockUpdate();
 }
 
 extern "C"
