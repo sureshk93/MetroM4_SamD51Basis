@@ -39,172 +39,205 @@ void __attribute__((cold)) NVM::boot()
   dataAreaCheck();
 }
 
-void NVM::nvmLowPower()
+void NVM::nvmPollReady()
+{
+  while(NVMCTRL->STATUS.bit.READY == 0);
+}
+
+void NVM::nvmLowPower(bool autoWait)
 {
   NVMCTRL->CTRLB.reg = NVMCTRL_CTRLB_CMDEX_KEY | NVMCTRL_CTRLB_CMD_SPRM;
-  while(NVMCTRL->STATUS.bit.READY == 0);
+
+  if(autoWait)
+    nvmPollReady();
 }
 
-void NVM::nvmHighPower()
+void NVM::nvmHighPower(bool autoWait)
 {
   NVMCTRL->CTRLB.reg = NVMCTRL_CTRLB_CMDEX_KEY | NVMCTRL_CTRLB_CMD_CPRM;
-  while(NVMCTRL->STATUS.bit.READY == 0);
+  if(autoWait)
+    nvmPollReady();
 }
 
-void NVM::nvmClearWriteBuffer()
+void NVM::nvmClearWriteBuffer(bool autoWait)
 {
   NVMCTRL->CTRLB.reg = NVMCTRL_CTRLB_CMDEX_KEY | NVMCTRL_CTRLB_CMD_PBC;
-  while(NVMCTRL->STATUS.bit.READY == 0);
+  if(autoWait)
+    nvmPollReady();
 }
 
-void NVM::nvmSetSecurity()
+void NVM::nvmSetSecurity(bool autoWait)
 {
   NVMCTRL->CTRLB.reg = NVMCTRL_CTRLB_CMDEX_KEY | NVMCTRL_CTRLB_CMD_SSB;
-  while(NVMCTRL->STATUS.bit.READY == 0);
+  if(autoWait)
+    nvmPollReady();
 }
 
-void NVM::nvmBankSwap()
+void NVM::nvmBankSwap(bool autoWait)
 {
   NVMCTRL->CTRLB.reg = NVMCTRL_CTRLB_CMDEX_KEY | NVMCTRL_CTRLB_CMD_BKSWRST;
-  while(NVMCTRL->STATUS.bit.READY == 0);
+  if(autoWait)
+    nvmPollReady();
 }
 
-void NVM::nvmDisableCE()
+void NVM::nvmDisableCE(bool autoWait)
 {
   NVMCTRL->CTRLB.reg = NVMCTRL_CTRLB_CMDEX_KEY | NVMCTRL_CTRLB_CMD_CELCK;
-  while(NVMCTRL->STATUS.bit.READY == 0);
+  if(autoWait)
+    nvmPollReady();
 }
 
-void NVM::nvmEnableCE()
+void NVM::nvmEnableCE(bool autoWait)
 {
   NVMCTRL->CTRLB.reg = NVMCTRL_CTRLB_CMDEX_KEY | NVMCTRL_CTRLB_CMD_CEULCK;
-  while(NVMCTRL->STATUS.bit.READY == 0);
+  if(autoWait)
+    nvmPollReady();
 }
 
-void NVM::nvmDisableBootProt()
+void NVM::nvmDisableBootProt(bool autoWait)
 {
   NVMCTRL->CTRLB.reg = NVMCTRL_CTRLB_CMDEX_KEY | NVMCTRL_CTRLB_CMD_SBPDIS;
-  while(NVMCTRL->STATUS.bit.READY == 0);
+  if(autoWait)
+    nvmPollReady();
 }
 
-void NVM::nvmEnableBootProt()
+void NVM::nvmEnableBootProt(bool autoWait)
 {
   NVMCTRL->CTRLB.reg = NVMCTRL_CTRLB_CMDEX_KEY | NVMCTRL_CTRLB_CMD_CBPDIS;
-  while(NVMCTRL->STATUS.bit.READY == 0);
+  if(autoWait)
+    nvmPollReady();
 }
 
-void NVM::nvmEraseBlock(var8 bank, var8 block)
+void NVM::nvmEraseBlock(var8 bank, var8 block, bool autoWait)
 {
   NVMCTRL->ADDR.bit.ADDR = getAddrNvmBlock(bank, block);
   NVMCTRL->CTRLB.reg = NVMCTRL_CTRLB_CMDEX_KEY | NVMCTRL_CTRLB_CMD_EB;
-  while(NVMCTRL->STATUS.bit.READY == 0);
+  if(autoWait)
+    nvmPollReady();
 }
 
-void NVM::nvmLockRegion(var8 bank, var8 region)
+void NVM::nvmLockRegion(var8 bank, var8 region, bool autoWait)
 {
   NVMCTRL->ADDR.bit.ADDR = getAddrNvmRegion(bank, region);
   NVMCTRL->CTRLB.reg = NVMCTRL_CTRLB_CMDEX_KEY | NVMCTRL_CTRLB_CMD_LR;
-  while(NVMCTRL->STATUS.bit.READY == 0);
+  if(autoWait)
+    nvmPollReady();
 }
 
-void NVM::nvmUnlockRegion(var8 bank, var8 region)
+void NVM::nvmUnlockRegion(var8 bank, var8 region, bool autoWait)
 {
   NVMCTRL->ADDR.bit.ADDR = getAddrNvmRegion(bank, region);
   NVMCTRL->CTRLB.reg = NVMCTRL_CTRLB_CMDEX_KEY | NVMCTRL_CTRLB_CMD_UR;
-  while(NVMCTRL->STATUS.bit.READY == 0);
+  if(autoWait)
+    nvmPollReady();
 }
 
-var32 NVM::nvmStartWritePage(var8 bank, var8 block, var8 page)
+var32 NVM::nvmStartWritePage(var8 bank, var8 block, var8 page, bool autoWait)
 {
-  nvmClearWriteBuffer();
+  nvmClearWriteBuffer(autoWait);
   var32 addr = getAddrNvmPage(bank, block, page);
   NVMCTRL->ADDR.bit.ADDR = addr;
   return addr;
 }
 
-var32 NVM::nvmStartWriteRegionPage(var8 bank, var8 region, var8 block, var8 page)
+var32 NVM::nvmStartWriteRegionPage(var8 bank, var8 region, var8 block, var8 page, bool autoWait)
 {
-  nvmClearWriteBuffer();
+  nvmClearWriteBuffer(autoWait);
   var32 addr = getAddrNvmRegionPage(bank, region, block, page);
   NVMCTRL->ADDR.bit.ADDR = addr;
   return addr;
 }
 
-void NVM::nvmEndWritePage()
+void NVM::nvmEndWritePage(bool autoWait)
 {
   NVMCTRL->CTRLB.reg = NVMCTRL_CTRLB_CMDEX_KEY | NVMCTRL_CTRLB_CMD_WP;
-  while(NVMCTRL->STATUS.bit.READY == 0);
+  if(autoWait)
+    nvmPollReady();
 }
 
-var32 NVM::nvmStartWriteQWord(var8 bank, var8 block, var8 page, var8 qword)
+var32 NVM::nvmStartWriteQWord(var8 bank, var8 block, var8 page, var8 qword, bool autoWait)
 {
-  nvmClearWriteBuffer();
+  nvmClearWriteBuffer(autoWait);
   var32 addr = getAddrNvmQWord(bank, block, page, qword);
   NVMCTRL->ADDR.bit.ADDR = addr;
   return addr;
 }
 
-var32 NVM::nvmStartWriteRegionQWord(var8 bank, var8 region, var8 block, var8 page, var8 qword)
+var32 NVM::nvmStartWriteRegionQWord(var8 bank, var8 region, var8 block, var8 page, var8 qword, bool autoWait)
 {
-  nvmClearWriteBuffer();
+  nvmClearWriteBuffer(autoWait);
   var32 addr = getAddrNvmRegionQWord(bank, region, block, page, qword);
   NVMCTRL->ADDR.bit.ADDR = addr;
   return addr;
 }
 
-void NVM::nvmEndWriteQWord()
+void NVM::nvmEndWriteQWord(bool autoWait)
 {
   NVMCTRL->CTRLB.reg = NVMCTRL_CTRLB_CMDEX_KEY | NVMCTRL_CTRLB_CMD_WQW;
-  while(NVMCTRL->STATUS.bit.READY == 0);
+  if(autoWait)
+    nvmPollReady();
 }
 
-void NVM::seepromLock()
+void NVM::seepromPollReady()
+{
+  nvmPollReady();
+  while(NVMCTRL->SEESTAT.bit.BUSY);
+}
+
+void NVM::seepromLock(bool autoWait)
 {
   NVMCTRL->CTRLB.reg = NVMCTRL_CTRLB_CMDEX_KEY | NVMCTRL_CTRLB_CMD_LSEE;
-  while(NVMCTRL->STATUS.bit.READY == 0 || NVMCTRL->SEESTAT.bit.BUSY);
+  if(autoWait)
+    seepromPollReady();
 }
 
-void NVM::seepromUnlock()
+void NVM::seepromUnlock(bool autoWait)
 {
   NVMCTRL->CTRLB.reg = NVMCTRL_CTRLB_CMDEX_KEY | NVMCTRL_CTRLB_CMD_USEE;
-  while(NVMCTRL->STATUS.bit.READY == 0 || NVMCTRL->SEESTAT.bit.BUSY);
+  if(autoWait)
+    seepromPollReady();
 }
 
-void NVM::seepromLockReg()
+void NVM::seepromLockReg(bool autoWait)
 {
   NVMCTRL->CTRLB.reg = NVMCTRL_CTRLB_CMDEX_KEY | NVMCTRL_CTRLB_CMD_LSEER;
-  while(NVMCTRL->STATUS.bit.READY == 0 || NVMCTRL->SEESTAT.bit.BUSY);
+  if(autoWait)
+    seepromPollReady();
 }
 
-void NVM::seepromUnlockReg()
+void NVM::seepromUnlockReg(bool autoWait)
 {
   NVMCTRL->CTRLB.reg = NVMCTRL_CTRLB_CMDEX_KEY | NVMCTRL_CTRLB_CMD_USEER;
-  while(NVMCTRL->STATUS.bit.READY == 0 || NVMCTRL->SEESTAT.bit.BUSY);
+  if(autoWait)
+    seepromPollReady();
 }
 
-void NVM::seepromRelocate()
+void NVM::seepromRelocate(bool autoWait)
 {
   NVMCTRL->CTRLB.reg = NVMCTRL_CTRLB_CMDEX_KEY | NVMCTRL_CTRLB_CMD_SEERALOC;
-  while(NVMCTRL->STATUS.bit.READY == 0 || NVMCTRL->SEESTAT.bit.BUSY);
+  if(autoWait)
+    seepromPollReady();
 }
 
-void NVM::seepromFlush()
+void NVM::seepromFlush(bool autoWait)
 {
   NVMCTRL->CTRLB.reg = NVMCTRL_CTRLB_CMDEX_KEY | NVMCTRL_CTRLB_CMD_SEEFLUSH;
-  while(NVMCTRL->STATUS.bit.READY == 0 || NVMCTRL->SEESTAT.bit.BUSY);
+  if(autoWait)
+    seepromPollReady();
 }
 
-void NVM::seepromSectorChange(var8 sector)
+void NVM::seepromSectorChange(var8 sector, bool autoWait)
 {
   if(sector == 0)
     NVMCTRL->CTRLB.reg = NVMCTRL_CTRLB_CMDEX_KEY | NVMCTRL_CTRLB_CMD_ASEES0;
   else
     NVMCTRL->CTRLB.reg = NVMCTRL_CTRLB_CMDEX_KEY | NVMCTRL_CTRLB_CMD_ASEES1;
 
-  while(NVMCTRL->STATUS.bit.READY == 0 || NVMCTRL->SEESTAT.bit.BUSY);
+  if(autoWait)
+    seepromPollReady();
 }
 
-void NVM::dataAreaCheck()
+void NVM::dataAreaCheck(bool autoWait)
 {
   bool pass = true; // Optimistic pass strategy
   for(var8 i = 0; i < auxSignatureLen; i++)
@@ -218,15 +251,15 @@ void NVM::dataAreaCheck()
 
   // Full format if signature is not present
   if(!pass)
-    dataFormat();
+    dataFormat(autoWait);
 }
 
-void NVM::dataFormat()
+void NVM::dataFormat(bool autoWait)
 {
   // Erase Axillary Banks
   for(var8 i = 0; i < auxNvmBlocks; i++)
   {
-    nvmEraseBlock(1, i);
+    nvmEraseBlock(1, i, true);
   }
 
   // Erase SEEPROM
@@ -235,7 +268,7 @@ void NVM::dataFormat()
 
     // Flush after every formatted page
     if((i % seepromPageSize) == 0)
-      seepromFlush();
+      seepromFlush(true);
 
     // Format to 0xFF
     // This helps save to some extent the underlying NVM
@@ -246,7 +279,7 @@ void NVM::dataFormat()
   }
 
   // Do a final flush of SEEPROM to NVM
-  seepromFlush();
+  seepromFlush(true);
 
   for(var8 i = 0; i < auxSignatureLen; i++)
   {
@@ -254,10 +287,10 @@ void NVM::dataFormat()
   }
 
   // Save signature update to disk
-  seepromFlush();
+  seepromFlush(autoWait);
 }
 
-void NVM::dataSaveState()
+void NVM::dataSaveState(bool autoWait)
 {
   // Some prep work converting linker markers to usable addresses
   // and additional prep work.
@@ -273,11 +306,11 @@ void NVM::dataSaveState()
 
     // Flush every page size
     if((i % seepromPageSize) == 0)
-      seepromFlush();
+      seepromFlush(true);
   }
 
   // Do a final flush
-  seepromFlush();
+  seepromFlush(autoWait);
 }
 
 void NVM::dataRestoreState()

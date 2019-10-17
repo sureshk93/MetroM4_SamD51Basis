@@ -70,6 +70,21 @@
  * 1 QWord = 16 Bytes
 */
 
+/*
+ * This takes advantage of the uC's RWW feature (Read-while-write)
+ * By default it polls all operations until they are ready, blocking the thread.
+ * You can optionally disable this wait and let it happen in the background (RWW) (Non-Blocking)
+ * But to use RWW:
+ *  1) You must work in the opposing bank only (Usually Bank 0, because Bank 1 is reserved for the program)
+ *  2) You must only do read operations on NVM or SEEPROM memory in the opposing bank
+ *
+ * Failure to follow these conditions will just cause the chip itself to block the thread and may overload the
+ * pipe. Thus when using the RWW feature and disabling autoWait make sure you follow these conditions.
+ *
+ * Some operations are not fully autoWait overrideable and will block anyways because they do many sensitive operations
+ * in a certain order usually allowing autoWait to be disabled only at the very end.
+*/
+
 #ifndef __NVM_H__
 #define __NVM_H__
 
@@ -83,45 +98,54 @@ public:
   static void boot();
 
   // Internal NVM Memory
-  static void nvmLowPower();
-  static void nvmHighPower();
-  static void nvmClearWriteBuffer();
-  static void nvmSetSecurity();
-  static void nvmBankSwap();
-  static void nvmDisableCE();
-  static void nvmEnableCE();
-  static void nvmDisableBootProt();
-  static void nvmEnableBootProt();
+  static void nvmPollReady();
 
-  static void nvmEraseBlock(var8 bank, var8 block);
-  static void nvmLockRegion(var8 bank, var8 region);
-  static void nvmUnlockRegion(var8 bank, var8 region);
+  static void nvmLowPower(bool autoWait = true);
+  static void nvmHighPower(bool autoWait = true);
+  static void nvmClearWriteBuffer(bool autoWait = true);
+  static void nvmSetSecurity(bool autoWait = true);
+  static void nvmBankSwap(bool autoWait = true);
+  static void nvmDisableCE(bool autoWait = true);
+  static void nvmEnableCE(bool autoWait = true);
+  static void nvmDisableBootProt(bool autoWait = true);
+  static void nvmEnableBootProt(bool autoWait = true);
 
-  static var32 nvmStartWritePage(var8 bank, var8 block, var8 page);
-  static var32 nvmStartWriteRegionPage(var8 bank, var8 region, var8 block, var8 page);
-  static void nvmEndWritePage();
+  static void nvmEraseBlock(var8 bank, var8 block, bool autoWait = true);
+  static void nvmLockRegion(var8 bank, var8 region, bool autoWait = true);
+  static void nvmUnlockRegion(var8 bank, var8 region, bool autoWait = true);
 
-  static var32 nvmStartWriteQWord(var8 bank, var8 block, var8 page, var8 qword);
-  static var32 nvmStartWriteRegionQWord(var8 bank, var8 region, var8 block, var8 page, var8 qword);
-  static void nvmEndWriteQWord();
+  static var32 nvmStartWritePage(var8 bank, var8 block, var8 page, bool autoWait = true);
+  static var32 nvmStartWriteRegionPage(var8 bank, var8 region, var8 block, var8 page, bool autoWait = true);
+  static void nvmEndWritePage(bool autoWait = true);
+
+  static var32 nvmStartWriteQWord(var8 bank, var8 block, var8 page, var8 qword, bool autoWait = true);
+  static var32 nvmStartWriteRegionQWord(var8 bank, var8 region, var8 block, var8 page, var8 qword, bool autoWait = true);
+  static void nvmEndWriteQWord(bool autoWait = true);
 
   // Internal SEEPROM Memory
-  static void seepromLock();
-  static void seepromUnlock();
-  static void seepromLockReg();
-  static void seepromUnlockReg();
-  static void seepromRelocate();
-  static void seepromFlush();
-  static void seepromSectorChange(var8 sector);
+  static void seepromPollReady();
+
+  static void seepromLock(bool autoWait = true);
+  static void seepromUnlock(bool autoWait = true);
+  static void seepromLockReg(bool autoWait = true);
+  static void seepromUnlockReg(bool autoWait = true);
+  static void seepromRelocate(bool autoWait = true);
+  static void seepromFlush(bool autoWait = true);
+  static void seepromSectorChange(var8 sector, bool autoWait = true);
 
   // Data Area
-
-  static void dataAreaCheck();
-  static void dataFormat();
+  // autoWait is mostly forced, there's too many sensitive operations
+  // that have to happen in order. autoWait option only applies to the last "wait"
+  // after everything else is over. In other words the function will end a bit early.
+  static void dataAreaCheck(bool autoWait = true);
+  static void dataFormat(bool autoWait = true);
 
   // Saves and restores all bytes in bkupram (The core programs memory state)
   // Useful for powering on and off keeping memory state
-  static void dataSaveState();
+  // autoWait is mostly forced, there's too many sensitive operations
+  // that have to happen in order. autoWait option only applies to the last "wait"
+  // after everything else is over. In other words the function will end a bit early.
+  static void dataSaveState(bool autoWait = true);
   static void dataRestoreState();
 
   // Addressing
