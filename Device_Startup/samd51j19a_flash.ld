@@ -72,8 +72,10 @@ SECTIONS
   {
     /*Start at top*/
     . = 0x00000000; /*New piece*/
+    _srom0 = .;
     _stext = .;
     _sfixed = .;
+    _scode = .;
 
     /*Vector Table*/
     /*Place Vectors at start of rom0 as required*/
@@ -127,22 +129,75 @@ SECTIONS
     /*Thumb <==> ARM Code Translation Glue*/
     . = ALIGN(16); /*New Subsection*/
     *(.glue_7t) *(.glue_7)
+    _ecode = .;
 
+    _srodata = .;
     /*Read-Only/Constant Data, placing in a new page*/
     . = ALIGN(512); /*New Page*/
     *(.rodata .rodata* .gnu.linkonce.r.*)
+    _erodata = .;
 
     . = ALIGN(512); /*New Page*/
     _lnl_start = .;
     *(.lnl*)
     _lnl_end = .;
 
+    . = ALIGN(512); /*New Page*/
+    _srom0_custom = .;
+    *(.rom0*)
+    _erom0_custom = .;
+
+    /*This writes in right after custom rom0 code the sizes of all areas and their max size*/
+    . = ALIGN(4); /*New Piece*/
+    _smemory_sizes = .;
+    LONG(_erom0 - _srom0)
+    LONG(0x00040000)
+
+    LONG(_ecode - _scode)
+    LONG(0x00040000)
+
+    LONG(_erodata - _srodata)
+    LONG(0x00040000)
+
+    LONG(_lnl_end - _lnl_start)
+    LONG(0x00000800)
+
+    LONG(_erom0_custom - _srom0_custom)
+    LONG(0x00040000)
+
+    LONG(_erom1 - _srom1)
+    LONG(0x00018000)
+
+    LONG(_eqspi - _sqspi)
+    LONG(0x01000000)
+
+    LONG(_erelocate - _srelocate)
+    LONG(0x00030000)
+
+    LONG(_ebss - _sbss)
+    LONG(0x00030000)
+
+    LONG(_estack - _sstack)
+    LONG(0x00030000)
+
+    LONG(_eseeprom - _sseeprom)
+    LONG(0x00010000)
+
+    LONG(_ebkupram - _sbkupram)
+    LONG(0x00002000)
+    _ememory_sizes = .;
+
+    . = ALIGN(4); /*New Piece*/
+    _efixed = .;
+
     /*This is for relocating data, place it in it's own page*/
     . = ALIGN(512); /*New Page*/
 
-    _efixed = .;
-    _etext = .;
     _placeRelocate = .; /*Place relocate data here*/
+
+    . = ALIGN(4); /*New Piece*/
+    _etext = .;
+    _erom0 = .;
 
     ASSERT((_lnl_end - _lnl_start) <= 0x800, "LNL is greater than 2KB");
   } > rom0 /*These of course go in the main rom bank*/
@@ -249,7 +304,7 @@ SECTIONS
   .seeprom (NOLOAD):
   {
     . = 0x00000000;
-    _seeprom = .;
+    _sseeprom = .;
     *(.seeprom*)
     _eseeprom = .;
   } > seeprom /*Goes into seeprom area*/

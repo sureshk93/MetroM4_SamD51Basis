@@ -43,7 +43,7 @@ void Cache::boot()
   // rather than trying to place everything essential in the start of memory
   enabledWays(4);
 
-  // Invalidate ways 0 & 1
+  // Invalidate ways 0 & 1 (2KB)
   invalidateWay(0);
   invalidateWay(1);
 
