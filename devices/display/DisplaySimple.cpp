@@ -75,7 +75,7 @@ void DisplaySimple::reset(bool autoUpdate /*= false*/, bool autoSend /*= false*/
     update(autoSend);
 }
 
-void  __attribute__((section(".lnl"))) DisplaySimple::setDigit(var8 ind, bool power)
+void  DisplaySimple::setDigit(var8 ind, bool power)
 {
   digits[ind].setDigit(ind, power);
 }
@@ -112,7 +112,7 @@ bool DisplaySimple::getSeg(var8 digit, var8 ind)
   return digits[digit].getSeg(ind);
 }
 
-void DisplaySimple::setCol(bool power)
+void __attribute__((section(".lnl"))) DisplaySimple::setCol(bool power)
 {
   digits[3].setCol(power);
 }
@@ -122,7 +122,7 @@ bool DisplaySimple::getCol()
   return digits[3].getCol();
 }
 
-void DisplaySimple::doTick()
+void __attribute__((section(".lnl"))) DisplaySimple::doTick()
 {
   if(!autoTickEn)
     return;

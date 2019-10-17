@@ -41,9 +41,7 @@ SEARCH_DIR(.)
 /* Memory Spaces Definitions */
 MEMORY
 {
-  rom0     (rx)  : ORIGIN = 0x00000000, LENGTH = 0x0003F800 /*Rom Bank 0: Main Bank (For Code)*/
-    lnl      (rx)  : ORIGIN = 0x0003F800, LENGTH = 0x00000800 /*Load-N-Lock 0-Wait State Speed: 2KB*/
-
+  rom0     (rx)  : ORIGIN = 0x00000000, LENGTH = 0x00040000 /*Rom Bank 0: Main Bank (For Code)*/
   rom1     (rx)  : ORIGIN = 0x00040000, LENGTH = 0x00018000 /*Rom Bank 1: Aux Bank (For Data)*/
   qspi     (rx)  : ORIGIN = 0x04000000, LENGTH = 0x01000000 /*External NVM: (Additional Aux Data on seperate chip)*/
   ram      (rwx) : ORIGIN = 0x20000000, LENGTH = 0x00030000 /*Ram (Default RAM)*/
@@ -134,29 +132,20 @@ SECTIONS
     . = ALIGN(512); /*New Page*/
     *(.rodata .rodata* .gnu.linkonce.r.*)
 
+    . = ALIGN(512); /*New Page*/
+    _lnl_start = .;
+    *(.lnl*)
+    _lnl_end = .;
+
     /*This is for relocating data, place it in it's own page*/
     . = ALIGN(512); /*New Page*/
 
     _efixed = .;
     _etext = .;
     _placeRelocate = .; /*Place relocate data here*/
+
+    ASSERT((_lnl_end - _lnl_start) <= 0x800, "LNL is greater than 2KB");
   } > rom0 /*These of course go in the main rom bank*/
-
-  /*
-    Load-N-Lock 0-Wait State Speed
-
-    Gameplan for .lnl output section
-
-    LNL is placed in it's own reserved memory area of a specific size in rom0. Space is
-    immensely cramped and every byte counts. No alignment will be done.
-  */
-  .lnl (NOLOAD):
-  {
-    . = 0x00000000;
-    _slnl = .;
-    *(.lnl*)
-    _elnl = .;
-  } > lnl /*Goes into it's own specific area*/
 
   /*
     Rom 1 Custom Code

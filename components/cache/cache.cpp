@@ -23,6 +23,14 @@
 
 #include "cache.h"
 #include "../int/int.h"
+#include "../../common/data.h"
+
+// Get address to the load-n-lock section of functions
+// This is dynamically created by the linker and the address
+// exposed to C++, it's filled with essential functions
+// It's a 2KB section that is supposed to be run purely from CPU cache
+// This class is suppose to lift and lock it into the CPU cache
+extern var32 _lnl_start;
 
 void Cache::boot()
 {
@@ -31,6 +39,8 @@ void Cache::boot()
 
   // Leverage all 4 ways
   // TCM doesn't benefit this application
+  // We do better hand-picking what goes into each way
+  // rather than trying to place everything essential in the start of memory
   enabledWays(4);
 
   // Invalidate ways 0 & 1
@@ -41,12 +51,12 @@ void Cache::boot()
   cacheLoadNLockInit();
 
   // We're already at way 0, begin loading
-  // The linker places a section at 0x3F800 that is 2KB in size (2 Ways in size) named "lnl"
+  // The linker dynamically places a section in rom0 that is 2KB in size (2 Ways in size) named "lnl"
   // Most all the code which runs as usual is placed there
   // These need to be locked into 2 ways, leaving 2 other ways for usual program activity
   // In other words all code in "lnl" will run with 0 wait states and perfect speed
-  cacheLoad((volatile var8*)0x3F800, waySize);
-  cacheLoad((volatile var8*)(0x3F800 + 0x400), waySize);
+  cacheLoad((var8*)&_lnl_start, waySize);
+  cacheLoad((var8*)&_lnl_start + waySize, waySize);
 
   // Lock the loaded code
   cacheLock(0);
