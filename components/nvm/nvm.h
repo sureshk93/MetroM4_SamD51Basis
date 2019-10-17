@@ -233,18 +233,17 @@ public:
   // Data Signature, this must be present at the start of axillary flash memory or the axillary memory is considered invalid and need
   // of formatting
   // CAFE BABE F1EE DECF FEED (10 bytes that must match)
-  // this must be filled to 32-bit boundaries
-  static constexpr var8 auxSignature[] = {
-    0xCA, 0xFE, 0xBA, 0xBE, 0xF1, 0xEE, 0xDE, 0xCF, 0xFE, 0xED, // Signature
-    0x00,                                                       // Force Format Code (changing this causes a forced-format)
-    0x00, 0x00, 0x00, 0x00, 0x00                                // Padded to fill 32-bit boundaries
+  static constexpr var8 auxSigCompare[] = {
+    0xCA, 0xFE, 0xBA, 0xBE, 0xF1, 0xEE, 0xDE, 0xCF, 0xFE, 0xED, // Signature (10 bytes)
+    0x00,                                                       // Force Format Code (changing this causes a forced-format) (1 byte)
   };
 
-  // Must be a multiple of 32-bit (4 Bytes)
-  static constexpr var8 auxSignatureLen = 16;
+  static constexpr var8 auxSignatureLen = 11;
 
   // Aux Blocks available to format
   static constexpr var8 auxNvmBlocks = 12;
+
+  static var8 auxSig[auxSignatureLen];
 };
 
 #endif

@@ -45,7 +45,7 @@ MEMORY
   rom1     (rx)  : ORIGIN = 0x00040000, LENGTH = 0x00018000 /*Rom Bank 1: Aux Bank (For Data)*/
   qspi     (rx)  : ORIGIN = 0x04000000, LENGTH = 0x01000000 /*External NVM: (Additional Aux Data on seperate chip)*/
   ram      (rwx) : ORIGIN = 0x20000000, LENGTH = 0x00030000 /*Ram (Default RAM)*/
-  seeprom  (rx)  : ORIGIN = 0x44000000, LENGTH = 0x00010000 /*SEEPROM: Runtime Permanent Data*/
+  seeprom  (rwx)  : ORIGIN = 0x44000000, LENGTH = 0x00010000 /*SEEPROM: Runtime Permanent Data*/
   bkupram  (rwx) : ORIGIN = 0x47000000, LENGTH = 0x00002000 /*Backup Ram: Program Data*/
 }
 
@@ -208,12 +208,10 @@ SECTIONS
     Gameplan for .rom1 output section
 
     Rom Bank 1 is more relaxed given the entire bank is for program usage.
-    This needs to be placed after the first page. The first page is reserved
-    for program-specific header data and work area.
   */
   .rom1 (NOLOAD):
   {
-    . = 0x00000000 + 512; /*2nd page from start*/
+    . = 0x00000000;
     _srom1 = .;
     *(.rom1*)
     _erom1 = .;

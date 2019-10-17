@@ -204,13 +204,10 @@ void NVM::seepromSectorChange(var8 sector)
 
 void NVM::dataAreaCheck()
 {
-  // First QWord of Data Bank (Bank B)
-  volatile var8* dataPtr = ptr8(getAddrNvmQWord(1, 0, 0, 0));
-
   bool pass = true; // Optimistic pass strategy
   for(var8 i = 0; i < auxSignatureLen; i++)
   {
-    if(dataPtr[i] != auxSignature[i])
+    if(auxSig[i] != auxSigCompare[i])
     {
       pass = false;
       break;
@@ -249,21 +246,13 @@ void NVM::dataFormat()
   // Do a final flush of SEEPROM to NVM
   seepromFlush();
 
-  // Write signature to indicate a valid format
-  // NVM requires a 32-bit write but we use 8-bit reads
-  // We must be careful to issue a 32-bit write that reads as intended in 8-bit
-  volatile var32* dataPtr = ptr32(nvmStartWriteQWord(1, 0, 0, 0));
-
-  for(var8 i = 0, j = 0; i < auxSignatureLen; i += 4, j++)
+  for(var8 i = 0; i < auxSignatureLen; i++)
   {
-    // Reverse order so they can be read correctly in 8-bit mode
-    dataPtr[j] = concat8to32(
-      auxSignature[i + 0],
-      auxSignature[i + 1],
-      auxSignature[i + 2],
-      auxSignature[i + 3]
-    );
+    auxSig[i] = auxSigCompare[i];
   }
 
-  nvmEndWriteQWord();
+  // Save signature update to disk
+  seepromFlush();
 }
+
+var8 __attribute__((section(".seeprom"))) NVM::auxSig[11];
