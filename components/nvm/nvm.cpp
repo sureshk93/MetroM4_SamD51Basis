@@ -24,6 +24,8 @@
 #include "nvm.h"
 #include "sam.h"
 
+extern var32 _sbkupramsave, _ebkupramsave, _sbkupram;
+
 void __attribute__((cold)) NVM::boot()
 {
   // Enter and exist standby mode based on cpu standby state
@@ -253,6 +255,45 @@ void NVM::dataFormat()
 
   // Save signature update to disk
   seepromFlush();
+}
+
+void NVM::dataSaveState()
+{
+  // Some prep work converting linker markers to usable addresses
+  // and additional prep work.
+  var8* stateSeeprom = (var8*)(&_sbkupramsave);
+  var8* stateBkup = (var8*)(&_sbkupram);
+  var8* stateSeepromEnd = (var8*)(&_ebkupramsave);
+  var32 stateSize = (var32)(stateSeepromEnd) - (var32)(stateSeeprom);
+
+  for(var32 i = 0; i < stateSize; i++)
+  {
+    // Copy byte-by-byte from bkupram to seeprom
+    stateSeeprom[i] = stateBkup[i];
+
+    // Flush every page size
+    if((i % seepromPageSize) == 0)
+      seepromFlush();
+  }
+
+  // Do a final flush
+  seepromFlush();
+}
+
+void NVM::dataRestoreState()
+{
+  // Some prep work converting linker markers to usable addresses
+  // and additional prep work.
+  var8* stateSeeprom = (var8*)(&_sbkupramsave);
+  var8* stateBkup = (var8*)(&_sbkupram);
+  var8* stateSeepromEnd = (var8*)(&_ebkupramsave);
+  var32 stateSize = (var32)(stateSeepromEnd) - (var32)(stateSeeprom);
+
+  for(var32 i = 0; i < stateSize; i++)
+  {
+    // Copy byte-by-byte from seeprom to bkupram
+    stateBkup[i] = stateSeeprom[i];
+  }
 }
 
 var8 __attribute__((section(".seeprom"))) NVM::auxSig[11];

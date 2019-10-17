@@ -304,7 +304,13 @@ SECTIONS
     . = 0x00000000;
     _sseeprom = .;
     *(.seeprom*)
+
+    _sbkupramsave = .;
+    . = . + (_ebkupram - _sbkupram); /*Insert area to save and restore all of used backup RAM*/
+    _ebkupramsave = .;
+
     _eseeprom = .;
+
   } > seeprom /*Goes into seeprom area*/
 
   /*

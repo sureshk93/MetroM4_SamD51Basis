@@ -119,6 +119,11 @@ public:
   static void dataAreaCheck();
   static void dataFormat();
 
+  // Saves and restores all bytes in bkupram (The core programs memory state)
+  // Useful for powering on and off keeping memory state
+  static void dataSaveState();
+  static void dataRestoreState();
+
   // Addressing
   // Returns a 32-bit requested address, this is not a pointer
   // The returned address needs to be made into a pointer of a certain size
